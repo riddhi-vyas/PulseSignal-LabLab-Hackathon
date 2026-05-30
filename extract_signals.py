@@ -9,13 +9,13 @@ load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
-    print("❌ Error: GEMINI_API_KEY not found. Please create a .env file.")
+    print("Error: GEMINI_API_KEY not found. Please create a .env file.")
     exit()
 
 # Configure the Gemini library with your key
 genai.configure(api_key=api_key)
 
-# We use Gemini 1.5 Flash because it is incredibly fast and perfect for text extraction
+# Initialize the generative model for text extraction
 model = genai.GenerativeModel('models/gemini-flash-latest')
 
 
@@ -91,7 +91,7 @@ def ask_gemini_to_extract(text):
         return structured_data
     
     except Exception as e:
-        print(f"⚠️ Gemini processing failed for this text: {e}")
+        print(f"Gemini processing failed for this text: {e}")
         print("Using fallback mock extraction instead.")
 
     return {
@@ -105,19 +105,19 @@ def ask_gemini_to_extract(text):
 
 def process_database():
     """Main loop: reads data, calls Gemini, saves results."""
-    print("⏳ Connecting to database...")
+    print("Connecting to database...")
     conn = sqlite3.connect("pulsesignal.db")
     cursor = conn.cursor()
     
     unprocessed_rows = get_unprocessed_data(conn)
-    print(f"🔍 Found {len(unprocessed_rows)} unprocessed records.")
+    print(f"Found {len(unprocessed_rows)} unprocessed records.")
     
     for row in unprocessed_rows:
         record_id = row[0]
         company = row[1]
         raw_text = row[2]
         
-        print(f"🧠 Processing {company} (ID: {record_id})...")
+        print(f"Processing {company} (ID: {record_id})...")
         extracted_data = ask_gemini_to_extract(raw_text)
         print("Extracted data:", extracted_data)
         
@@ -146,10 +146,10 @@ def process_database():
             ''', (record_id,))
             
             conn.commit()
-            print(f"✅ Successfully structured data for {record_id}")
+            print(f"Successfully structured data for {record_id}")
 
     conn.close()
-    print("🎉 Step 2 complete! The structured_signals table is populated.")
+    print("Step 2 complete: The structured_signals table is populated.")
 
 if __name__ == "__main__":
     process_database()

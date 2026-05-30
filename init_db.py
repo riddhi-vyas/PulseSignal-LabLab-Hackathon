@@ -7,7 +7,7 @@ DB_NAME = "pulsesignal.db"
 
 def initialize_database():
     """This function creates the database file and sets up our two tables."""
-    print("⏳ Connecting to database...")
+    print("Connecting to database...")
     
     # Connect to the file. If it doesn't exist, Python creates it.
     conn = sqlite3.connect(DB_NAME)
@@ -39,16 +39,16 @@ def initialize_database():
 
     # Save the changes to the file
     conn.commit()
-    print("✅ Tables created successfully.")
+    print("Tables created successfully.")
     return conn
 
 def load_fake_data(conn):
     """This function reads the JSON file and puts it into the raw_cache table."""
-    print("⏳ Loading data from sample_data.json...")
+    print("Loading data from sample_data.json...")
     
     # Safety check: make sure the JSON file exists
     if not os.path.exists("sample_data.json"):
-        print("❌ Error: Cannot find sample_data.json. Please make sure it is in the same folder.")
+        print("Error: Cannot find sample_data.json. Please ensure it is in the same directory.")
         return
 
     # Open and read the JSON file
@@ -75,7 +75,7 @@ def load_fake_data(conn):
 
     # Save the new rows
     conn.commit()
-    print(f"✅ Successfully loaded {inserted_count} new records into the database.")
+    print(f"Successfully loaded {inserted_count} new records into the database.")
 
 # This is the starting block of the script
 if __name__ == "__main__":
@@ -86,4 +86,4 @@ if __name__ == "__main__":
     # 3. Close the connection
     db_connection.close()
     
-    print("🎉 Step 1 complete! Riddhi can now connect Streamlit to pulsesignal.db")
+    print("Step 1 complete: Database initialized.")

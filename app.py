@@ -19,7 +19,7 @@ from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="PulseSignal | Market Intelligence", page_icon="📈", layout="wide")
+st.set_page_config(page_title="PulseSignal | Market Intelligence", layout="wide")
 
 # --- THE SAAS ILLUSION (CUSTOM CSS INJECTION) ---
 st.markdown("""
@@ -164,18 +164,18 @@ if not df.empty:
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.title("📈 PulseSignal")
+    st.title("PulseSignal")
     st.write("**GTM Strategy Engine**")
     
-    # UI UPGRADE: Sync Button
-    if st.button("🔄 Sync & Refresh Data"):
+    # Sync Button
+    if st.button("Sync and Refresh Data"):
         st.cache_data.clear()
         st.rerun()
 
-    st.info("Targeting high-intent AI accounts across Giants & Disruptors.")
+    st.info("Monitoring high-intent AI accounts across various market segments.")
     
     st.markdown("---")
-    st.write("### 🔍 ICP Filters")
+    st.write("### Filters")
     # New Segmentation Filters
     segment_filter = st.multiselect(
         "Market Segment", 
@@ -226,11 +226,11 @@ st.title("Enterprise Hiring Pulse")
 st.write("Autonomous Market Intelligence for GTM and Investment Teams.")
 
 # --- TABS FOR DIFFERENT PERSONAS ---
-tab_dashboard, tab_manager = st.tabs(["🚀 Command Center", "📂 Manager's Weekly Report"])
+tab_dashboard, tab_manager = st.tabs(["Command Center", "Management Report"])
 
 with tab_dashboard:
     if df_filtered.empty:
-        st.warning("⚠️ No accounts match your current ICP filters. Adjust the filters in the sidebar.")
+        st.warning("No accounts match your current filters. Adjust the filters in the sidebar.")
     else:
         # Top KPI Metrics
         col1, col2, col3, col4 = st.columns(4)
@@ -253,12 +253,12 @@ with tab_dashboard:
         # (Velocity weight 60% + Stage weight 40%)
         signal_score = min(int((top_count / len(df_filtered)) * 100 * 2), 99)
 
-        st.markdown("### 🔥 Strategic Account Alert")
-        st.error(f"**{top_company}** is showing the highest 'Strategic Fit' for your current ICP filters.")
+        st.markdown("### Strategic Account Alert")
+        st.error(f"**{top_company}** is identified as having a high strategic alignment.")
         st.metric("Pulse Match Score", f"{signal_score}/100", delta="High Intent")
         st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown("### 🎯 Strategic Market Intelligence")
+        st.markdown("### Strategic Market Intelligence")
         st.write("Visualizing the 'Hiring Intensity' acceleration—a leading indicator of corporate budget shifts.")
         col_chart, col_table = st.columns(2)
 
@@ -309,7 +309,7 @@ with tab_manager:
             )
             st.plotly_chart(fig_bubble, use_container_width=True)
             
-        st.markdown("#### 🏆 Top Prospecting Targets (Ranked by Strategic Fit)")
+        st.markdown("#### Top Prospecting Targets (Ranked by Strategic Fit)")
         # Calculate a real Fit Score for the table
         rank_df = df_filtered.copy()
         company_signals = rank_df['company'].value_counts().to_dict()
@@ -332,7 +332,7 @@ with tab_manager:
 
 # --- PERSONA PLAYBOOKS & AGENT PIPELINE (TRACK B - STEP 2) ---
 st.markdown("---")
-st.header("💡 AI Business Insights")
+st.header("Business Insights")
 st.write(f"Actionable intelligence generated from live web signals. *Replaces **{hours_saved if not df_filtered.empty else 0}** hours of manual GTM research.*")
 
 # Check for API Keys
@@ -340,10 +340,10 @@ api_key = os.environ.get("GOOGLE_API_KEY")
 aiml_api_key = os.environ.get("AIML_API_KEY")
 
 if not api_key:
-    st.error("🔑 GOOGLE_API_KEY environment variable is not set. Please set it in your terminal to use AI features.")
+    st.error("GOOGLE_API_KEY environment variable is not set. Please set it in your terminal to use AI features.")
 else:
     if not aiml_api_key:
-        st.warning("⚠️ AIML_API_KEY not found. Using Gemini for intelligence (Bounty requirement missing).")
+        st.warning("AIML_API_KEY not found. Using Gemini for intelligence.")
         # Fallback to Gemini
         llm = ChatGoogleGenerativeAI(
             model="models/gemini-2.0-flash", 
@@ -358,14 +358,14 @@ else:
             base_url="https://api.aimlapi.com/v1", 
             model="meta-llama/Llama-3.3-70B-Instruct-Turbo" 
         )
-        st.sidebar.success("🚀 Hybrid AI Engine: Active (Llama-3.3 + Gemini)")
+        st.sidebar.success("Hybrid AI Engine: Active (Llama-3.3 + Gemini)")
 
     # --- SIDEBAR ACTIONS ---
     csv_data = df.to_csv(index=False).encode('utf-8')
     st.sidebar.markdown("---")
     st.sidebar.write("**Data Actions**")
     st.sidebar.download_button(
-        label="📥 Export to CRM (CSV)",
+        label="Export to CRM (CSV)",
         data=csv_data,
         file_name="gtm_intercept_signals.csv",
         mime="text/csv",
@@ -391,16 +391,15 @@ else:
         """
     )
     
-    if st.button("Run Multi-Agent Intelligence Pipeline", type="primary"):
-        # UI UPGRADE: The Agent Pipeline Visualizer
-        with st.status("Initializing Multi-Agent Pipeline...", expanded=True) as status:
-            st.write("🔍 Agent 1 (Data Fetcher): Scanning SQLite database for live web signals...")
+    if st.button("Generate Market Intelligence Report", type="primary"):
+        with st.status("Generating Report...", expanded=True) as status:
+            st.write("Accessing data sources for live web signals...")
             data_string = df.to_string()
             
-            st.write("🧠 Agent 2 (Synthesizer): Cross-referencing skills with GTM priorities...")
+            st.write("Synthesizing market priorities...")
             chain = insight_prompt | llm
             
-            st.write("✍️ Agent 3 (Reporting): Formatting insights for enterprise personas...")
+            st.write("Finalizing report for review...")
             response = chain.invoke({"raw_data": data_string})
             
             # Save to session state so it doesn't disappear on next button click
@@ -409,7 +408,7 @@ else:
             status.update(label="Intelligence Pipeline Complete!", state="complete", expanded=False)
 
     # UI UPGRADE: The Evidence Ledger
-    st.markdown("#### 🔎 Evidence Ledger")
+    st.markdown("#### Evidence Ledger")
     with st.expander("View Raw Intercepted Web Signals"):
         st.write("Transparent, deterministic tracking of all scraped web data.")
         st.dataframe(df, use_container_width=True)
@@ -419,12 +418,12 @@ else:
         st.info(st.session_state['intelligence_report'])
         
         # UI UPGRADE: Action Pack (Cold Email Generator)
-        st.markdown("#### ⚡ Execute Action Pack")
+        st.markdown("#### Execute Action Pack")
         col_email, col_trigger = st.columns(2)
         
         with col_email:
             if st.button("Draft Outreach Email (AI)"):
-                with st.spinner("Agent 4 (Copywriter): Drafting personalized outreach..."):
+                with st.spinner("Drafting personalized outreach..."):
                     email_prompt = PromptTemplate.from_template(
                         """
                         Write a short, punchy cold email to the VP of Engineering at {company}.
@@ -467,7 +466,7 @@ else:
                         cursor: pointer;
                         box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
                     ">
-                        🚀 SEND VIA GMAIL (Real Action)
+                        INITIATE OUTREACH (Browser)
                     </button>
                 </a>
             """, unsafe_allow_html=True)
@@ -475,7 +474,7 @@ else:
 
     # --- RAG Q&A CHATBOT (TRACK B - STEP 3) ---
     st.markdown("---")
-    st.header("💬 Query Market Signals (RAG)")
+    st.header("Query Market Signals")
     st.write("Ask natural language questions about the extracted market intelligence.")
 
     # 1. Prepare Data Chunks for Vector Store
