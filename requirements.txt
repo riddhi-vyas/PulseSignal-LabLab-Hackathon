@@ -4,5 +4,6 @@ plotly
 langchain
 langchain-google-genai
 langchain-community
-faiss-cpupython-dotenv
-langchainhub
+langchain-openai
+faiss-cpu
+python-dotenv
