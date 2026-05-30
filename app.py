@@ -455,6 +455,8 @@ else:
 
     # Display the report if it exists in session state
     if 'intelligence_report' in st.session_state:
+        with st.expander("ℹ️ Methodology: How is the Pipeline Value Calculated?"):
+            st.write("The **Estimated Pipeline Value** is programmatically estimated by our reasoning engine. It multiplies the volume of high-intent hiring signals detected for a company by a baseline Enterprise Annual Contract Value (ACV) of **$120,000**.")
         st.info(st.session_state['intelligence_report'])
         
         # UI UPGRADE: Action Pack (Cold Email Generator)
