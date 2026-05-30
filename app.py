@@ -433,15 +433,15 @@ else:
         """
     )
     
-    if st.button("Generate Market Intelligence Report", type="primary"):
-        with st.status("Generating Report...", expanded=True) as status:
-            st.write("Accessing data sources for live web signals...")
+    if st.button("Run Multi-Agent Intelligence Pipeline", type="primary"):
+        with st.status("Initializing Multi-Agent Pipeline...", expanded=True) as status:
+            st.write("Agent 1 (Data Fetcher): Scanning SQLite database for live web signals...")
             data_string = df.to_string()
             
-            st.write("Synthesizing market priorities...")
+            st.write("Agent 2 (Synthesizer): Cross-referencing skills with GTM priorities...")
             chain = insight_prompt | llm
             
-            st.write("Finalizing report for review...")
+            st.write("Agent 3 (Reporting): Formatting insights for enterprise personas...")
             response = chain.invoke({"raw_data": data_string})
             
             # Save to session state so it doesn't disappear on next button click
