@@ -5,6 +5,7 @@ import os
 import plotly.express as px
 import requests
 import time
+import urllib.parse
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -363,37 +364,58 @@ else:
         
         # UI UPGRADE: Action Pack (Cold Email Generator)
         st.markdown("#### ⚡ Execute Action Pack")
-        if st.button("Draft Automated Outreach Email (Sales)"):
-            with st.spinner("Agent 4 (Copywriter): Drafting hyper-personalized outreach based on live signals..."):
-                email_prompt = PromptTemplate.from_template(
-                    """
-                    You are a top-tier B2B sales rep. Write a short, punchy cold email to the VP of Engineering at the company with the highest signal count from this data: {data}.
-                    
-                    Rules:
-                    1. Mention the specific skills or business priorities they are hiring for based ON THE DATA.
-                    2. Keep it under 100 words.
-                    3. No generic fluff. Be direct.
-                    """
-                )
-                email_chain = email_prompt | llm
-                email_res = email_chain.invoke({"data": df.to_string()})
-                st.success("Draft Generated Successfully. Ready for CRM Export.")
-                st.code(email_res.content, language="markdown")
+        col_email, col_trigger = st.columns(2)
+        
+        with col_email:
+            if st.button("Draft Outreach Email (AI)"):
+                with st.spinner("Agent 4 (Copywriter): Drafting personalized outreach..."):
+                    email_prompt = PromptTemplate.from_template(
+                        """
+                        Write a short, punchy cold email to the VP of Engineering at {company}.
+                        Context: They are hiring for {skills} and prioritizing {priority}.
+                        Rules: Under 100 words, direct, no fluff.
+                        """
+                    )
+                    top_row = df_filtered.iloc[0]
+                    email_chain = email_prompt | llm
+                    email_res = email_chain.invoke({
+                        "company": top_row['company'],
+                        "skills": top_row['skills'],
+                        "priority": top_row['business_priority']
+                    })
+                    st.session_state['drafted_email'] = email_res.content
+                    st.success("Draft Generated.")
 
-        # UI UPGRADE: TriggerWare Automation
-        if st.button("⚡ Push Top Lead to TriggerWare"):
-            with st.spinner("Executing workflow..."):
-                # Example webhook URL from TriggerWare
-                webhook_url = "https://hooks.triggerware.ai/v1/example" # You can replace this with your actual URL
-                top_lead = df.iloc[0].to_dict() # Grabs the most recent signal
-                
-                try:
-                    # In a real demo, this would push to Slack/Email via TriggerWare
-                    # requests.post(webhook_url, json=top_lead) 
-                    time.sleep(1) # Simulating API call
-                    st.success("Workflow triggered! Lead pushed to Slack/CRM via TriggerWare.")
-                except Exception as e:
-                    st.error("Workflow execution failed.")
+        # Display the draft and the "Real Action" button
+        if 'drafted_email' in st.session_state:
+            st.code(st.session_state['drafted_email'], language="markdown")
+            
+            # --- THE MAGIC MOMENT: REAL GMAIL ACTION ---
+            top_row = df_filtered.iloc[0]
+            subject = f"Market Intelligence Signal: {top_row['company']} Infrastructure"
+            body = st.session_state['drafted_email']
+            
+            # Encode for URL
+            mailto_link = f"mailto:vp-eng@{top_row['company'].lower().replace(' ', '')}.ai?subject={urllib.parse.quote(subject)}&body={urllib.parse.quote(body)}"
+            
+            st.markdown(f"""
+                <a href="{mailto_link}" target="_blank">
+                    <button style="
+                        background: linear-gradient(135deg, #FF4B2B 0%, #FF416C 100%);
+                        color: white;
+                        font-weight: 600;
+                        border: none;
+                        border-radius: 8px;
+                        padding: 0.8rem 2rem;
+                        width: 100%;
+                        cursor: pointer;
+                        box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
+                    ">
+                        🚀 SEND VIA GMAIL (Real Action)
+                    </button>
+                </a>
+            """, unsafe_allow_html=True)
+            st.write("<small>*Note: Clicking this will open your actual mail app with the AI draft pre-loaded.*</small>", unsafe_allow_html=True)
 
     # --- RAG Q&A CHATBOT (TRACK B - STEP 3) ---
     st.markdown("---")
