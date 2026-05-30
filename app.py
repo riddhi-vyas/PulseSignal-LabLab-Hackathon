@@ -377,13 +377,13 @@ else:
         )
     else:
         # SUCCESS: Initialize Hybrid Multi-Model Architecture
-        # Using Llama-3.3 70B via AI/ML API for high-reasoning market intelligence
+        # Using DeepSeek V4 Flash via AI/ML API for high-reasoning market intelligence
         llm = ChatOpenAI(
             api_key=aiml_api_key, 
             base_url="https://api.aimlapi.com/v1", 
-            model="meta-llama/Llama-3.3-70B-Instruct-Turbo" 
+            model="deepseek/deepseek-v4-flash" 
         )
-        st.sidebar.success("Hybrid AI Engine: Active (Llama-3.3 + Gemini)")
+        st.sidebar.success("Hybrid AI Engine: Active (DeepSeek + Gemini)")
 
     # --- SIDEBAR ACTIONS ---
     csv_data = df.to_csv(index=False).encode('utf-8')
