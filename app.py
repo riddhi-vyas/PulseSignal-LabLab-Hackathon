@@ -415,15 +415,17 @@ else:
         
         {raw_data}
         
-        Generate a highly concise "Why this matters" summary and a "Recommended Action" for three distinct enterprise personas.
-        CRITICAL RULE: You MUST ground your insights with concrete evidence counts (e.g., "based on 3 job postings").
+        Generate an Executive Summary for three distinct enterprise personas (Sales, Recruiting, Investors).
+        CRITICAL RULES:
+        1. NO "walls of text". Use highly scannable formatting (bullet points, bold text).
+        2. You MUST ground your insights with concrete evidence counts (e.g., "based on 12 job postings").
         
-        Format your response exactly like this:
-        **For Sales Teams:** [1 sentence insight]. **Next Step:** [1 specific sales action].
+        Format your response EXACTLY like this structure for each persona:
         
-        **For Recruiters:** [1 sentence insight]. **Next Step:** [1 specific recruiting action].
-        
-        **For Investors:** [1 sentence insight]. **Next Step:** [1 specific investment action].
+        ### 🎯 For [Persona Name]
+        *   **The Signal (What):** [1 sentence data-backed observation]
+        *   **The Impact (So What):** [1 sentence explaining the business shift]
+        *   **Action Item (Now What):** [1 specific, urgent action they must take today]
         """
     )
     
