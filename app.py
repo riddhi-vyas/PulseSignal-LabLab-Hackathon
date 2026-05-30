@@ -17,7 +17,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
-from langchain.agents import AgentExecutor, create_openai_functions_agent, Tool
+from langchain.agents import AgentExecutor, create_react_agent, Tool
 from langchain import hub
 
 # --- PAGE CONFIG ---
@@ -545,10 +545,15 @@ else:
 
     # Pull the prompt from LangChain Hub for Function Calling
     # We use a custom-tailored prompt for an Intelligence Agent
-    agent_prompt = hub.pull("hwchase17/openai-functions-agent")
+    agent_prompt = hub.pull("hwchase17/react")
+    
+    # Custom instructions to force the agent to use tools for real-time data
+    agent_prompt.template = """You are a Go-To-Market Intelligence Agent. You must use tools to find answers.
+If asked about company valuations, news, or current events, YOU MUST USE THE Live_Web_Search tool. Do not rely on your internal memory for valuations.
+""" + agent_prompt.template
 
-    agent = create_openai_functions_agent(llm, tools, agent_prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+    agent = create_react_agent(llm, tools, agent_prompt)
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
 
     # Initialize chat history in session state
     if "messages" not in st.session_state:
