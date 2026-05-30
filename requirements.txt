@@ -1,9 +1,10 @@
 streamlit
 pandas
 plotly
-langchain
+langchain<=0.2.16
+langchain-community<=0.2.16
+langchain-core<=0.2.43
 langchain-google-genai
-langchain-community
 langchain-openai
 faiss-cpu
 python-dotenv
