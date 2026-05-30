@@ -519,6 +519,13 @@ else:
     vector_store = create_vector_store(documents, api_key)
     retriever = vector_store.as_retriever(search_kwargs={"k": 3})
 
+    # 2.5 Initialize the RAG Chain for the database tool
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=llm, 
+        chain_type="stuff", 
+        retriever=retriever
+    )
+
     # 3. Agent & Tool Setup
     # Tool A: The Local Database (RAG)
     db_tool = Tool(
