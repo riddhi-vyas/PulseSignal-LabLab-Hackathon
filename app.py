@@ -17,6 +17,8 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
+from langchain.agents import AgentExecutor, create_openai_functions_agent, Tool
+from langchain import hub
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="PulseSignal | Market Intelligence", layout="wide")
@@ -115,6 +117,29 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# --- LIVE RESEARCH TOOL (BRIGHT DATA) ---
+def bright_data_search(query):
+    """Performs a live Google search via Bright Data for real-time intelligence."""
+    api_key = os.getenv("BRIGHTDATA_API_KEY")
+    zone = os.getenv("BRIGHTDATA_ZONE", "pulsesignal_serp")
+    
+    if not api_key:
+        return "Error: Bright Data API key missing."
+        
+    url = f"https://www.google.com/search?q={urllib.parse.quote(query)}"
+    payload = {"zone": zone, "url": url, "format": "json"}
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
+    
+    try:
+        response = requests.post("https://api.brightdata.com/request", headers=headers, json=payload, timeout=15)
+        data = response.json()
+        # Extract snippets from organic results
+        results = data.get("organic", [])[:3]
+        summaries = [f"{r.get('title')}: {r.get('description')}" for r in results]
+        return "\n\n".join(summaries) if summaries else "No real-time results found."
+    except Exception as e:
+        return f"Search failed: {str(e)}"
 
 # --- DATABASE CONNECTION ---
 @st.cache_data
@@ -494,25 +519,29 @@ else:
     vector_store = create_vector_store(documents, api_key)
     retriever = vector_store.as_retriever(search_kwargs={"k": 3})
 
-    # 3. Chat Interface Setup
-    # Updated prompt to provide technical context for AI-specific terms like RAG
-    template = """
-    You are an elite Go-To-Market Market Intelligence Analyst.
-    Use the following pieces of context to answer the user's question. 
-    Note: In this technical context, 'RAG' refers to Retrieval-Augmented Generation (AI/LLM infrastructure).
-    
-    Context: {context}
-    Question: {question}
-    
-    Answer:
-    """
-    qa_prompt = PromptTemplate.from_template(template)
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm, 
-        chain_type="stuff", 
-        retriever=retriever,
-        chain_type_kwargs={"prompt": qa_prompt}
+    # 3. Agent & Tool Setup
+    # Tool A: The Local Database (RAG)
+    db_tool = Tool(
+        name="Market_Database",
+        func=qa_chain.invoke,
+        description="Use this tool to find hiring signals, skills, and business priorities in the local database."
     )
+
+    # Tool B: Live Web Search (Bright Data)
+    search_tool = Tool(
+        name="Live_Web_Search",
+        func=bright_data_search,
+        description="Use this tool to find REAL-TIME information like valuations, latest news, and current events that are NOT in the database."
+    )
+
+    tools = [db_tool, search_tool]
+
+    # Pull the prompt from LangChain Hub for Function Calling
+    # We use a custom-tailored prompt for an Intelligence Agent
+    agent_prompt = hub.pull("hwchase17/openai-functions-agent")
+
+    agent = create_openai_functions_agent(llm, tools, agent_prompt)
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
     # Initialize chat history in session state
     if "messages" not in st.session_state:
@@ -524,7 +553,7 @@ else:
             st.markdown(message["content"])
 
     # Accept user input
-    if prompt := st.chat_input("E.g., 'Which company is focusing on AI Infrastructure?'"):
+    if prompt := st.chat_input("E.g., 'What is Anthropic's latest valuation?'"):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -532,9 +561,13 @@ else:
 
         # Generate assistant response
         with st.chat_message("assistant"):
-            with st.spinner("Scanning vector database..."):
-                result = qa_chain.invoke(prompt)
-                answer = result['result']
-                st.markdown(answer)
-                # Add assistant response to chat history
-                st.session_state.messages.append({"role": "assistant", "content": answer})
+            with st.spinner("Executing autonomous market research..."):
+                try:
+                    # The Agent now decides which tool to use!
+                    result = agent_executor.invoke({"input": prompt})
+                    answer = result['output']
+                    st.markdown(answer)
+                    # Add assistant response to chat history
+                    st.session_state.messages.append({"role": "assistant", "content": answer})
+                except Exception as e:
+                    st.error(f"Agent reasoning failed: {str(e)}")
