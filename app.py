@@ -133,10 +133,20 @@ def bright_data_search(query):
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
     
     try:
+        import json
         response = requests.post("https://api.brightdata.com/request", headers=headers, json=payload, timeout=15)
         data = response.json()
-        # Extract snippets from organic results
-        results = data.get("organic", [])[:3]
+        
+        # Bright Data often returns the actual content as a stringified JSON inside the "body" key
+        if "body" in data:
+            try:
+                body_data = json.loads(data["body"])
+                results = body_data.get("organic", [])[:3]
+            except json.JSONDecodeError:
+                results = []
+        else:
+            results = data.get("organic", [])[:3]
+            
         summaries = [f"{r.get('title')}: {r.get('description')}" for r in results]
         return "\n\n".join(summaries) if summaries else "No real-time results found."
     except Exception as e:
