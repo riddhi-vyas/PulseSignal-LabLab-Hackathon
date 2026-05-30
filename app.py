@@ -263,16 +263,48 @@ with tab_manager:
             st.plotly_chart(fig_pie, use_container_width=True)
             
         with col_m2:
-            st.write("**Account Breakdown by Size**")
-            size_data = df_filtered.groupby('company_size').size().reset_index(name='Signal Count')
-            fig_funnel = px.funnel(size_data, x='Signal Count', y='company_size')
-            st.plotly_chart(fig_funnel, use_container_width=True)
+            st.write("**Account Prioritization Matrix**")
+            # Aggregating for the Bubble Chart
+            matrix_data = df_filtered.groupby(['company', 'company_size', 'growth_stage']).size().reset_index(name='Signal Count')
             
-        st.markdown("#### 🏆 Top Prospecting Targets (Ranked by Intent)")
-        # Calculate a fit score per row for ranking
+            fig_bubble = px.scatter(
+                matrix_data,
+                x='Signal Count',
+                y='company_size',
+                size='Signal Count',
+                color='growth_stage',
+                hover_name='company',
+                labels={'company_size': 'Account Scale', 'Signal Count': 'Hiring Velocity'},
+                size_max=40
+            )
+            # Make the chart look premium
+            fig_bubble.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                margin=dict(l=0, r=0, t=30, b=0)
+            )
+            st.plotly_chart(fig_bubble, use_container_width=True)
+            
+        st.markdown("#### 🏆 Top Prospecting Targets (Ranked by Strategic Fit)")
+        # Calculate a real Fit Score for the table
         rank_df = df_filtered.copy()
-        # Mock ranking based on team signal importance
-        st.table(rank_df[['company', 'growth_stage', 'company_size', 'business_priority']].head(10))
+        company_signals = rank_df['company'].value_counts().to_dict()
+        
+        # Calculate score: (Signals * 10) + (100 if Enterprise else 50)
+        rank_df['Fit Score'] = rank_df['company'].apply(lambda x: company_signals.get(x, 0) * 10)
+        rank_df.loc[rank_df['company_size'] == 'Enterprise (501+)', 'Fit Score'] += 50
+        
+        # Deduplicate and sort
+        table_df = rank_df.drop_duplicates(subset=['company']).sort_values('Fit Score', ascending=False)
+        
+        st.dataframe(
+            table_df[['company', 'growth_stage', 'company_size', 'Fit Score', 'business_priority']],
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Fit Score": st.column_config.ProgressColumn("Fit Score", min_value=0, max_value=150, format="%d")
+            }
+        )
 
 # --- PERSONA PLAYBOOKS & AGENT PIPELINE (TRACK B - STEP 2) ---
 st.markdown("---")
