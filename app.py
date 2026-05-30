@@ -389,19 +389,19 @@ else:
         # Display the draft and the "Real Action" button
         if 'drafted_email' in st.session_state:
             st.code(st.session_state['drafted_email'], language="markdown")
-            
-            # --- THE MAGIC MOMENT: REAL GMAIL ACTION ---
+            # --- THE MAGIC MOMENT: DIRECT GMAIL WEB ACTION ---
             top_row = df_filtered.iloc[0]
             subject = f"Market Intelligence Signal: {top_row['company']} Infrastructure"
             body = st.session_state['drafted_email']
-            
-            # Encode for URL
-            mailto_link = f"mailto:vp-eng@{top_row['company'].lower().replace(' ', '')}.ai?subject={urllib.parse.quote(subject)}&body={urllib.parse.quote(body)}"
-            
+
+            # Construct Direct Gmail Compose URL
+            gmail_url = f"https://mail.google.com/mail/?view=cm&fs=1&to=vp-eng@{top_row['company'].lower().replace(' ', '')}.ai&su={urllib.parse.quote(subject)}&body={urllib.parse.quote(body)}"
+
             st.markdown(f"""
-                <a href="{mailto_link}" target="_blank">
+                <a href="{gmail_url}" target="_blank">
                     <button style="
                         background: linear-gradient(135deg, #FF4B2B 0%, #FF416C 100%);
+            ...
                         color: white;
                         font-weight: 600;
                         border: none;
