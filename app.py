@@ -6,6 +6,7 @@ import plotly.express as px
 import requests
 import time
 import urllib.parse
+import datetime
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -548,12 +549,16 @@ else:
     agent_prompt = hub.pull("hwchase17/react")
     
     # Custom instructions to force the agent to use tools for real-time data
-    agent_prompt.template = """You are a Go-To-Market Intelligence Agent. You must use tools to find answers.
-If asked about company valuations, news, or current events, YOU MUST USE THE Live_Web_Search tool. Do not rely on your internal memory for valuations.
+    current_date = datetime.date.today().strftime("%B %d, %Y")
+    agent_prompt.template = f"""You are a Go-To-Market Intelligence Agent. Today's date is {current_date}. 
+You must use tools to find answers about live data. If asked about company valuations, news, or current events, YOU MUST USE THE Live_Web_Search tool. Do not rely on your internal memory for these.
+CRITICAL FORMATTING RULE: If you already know the answer (like the current date), or when you have finished using tools, you MUST output your final answer using exactly this format:
+Thought: I now know the final answer
+Final Answer: [your exact answer here]
 """ + agent_prompt.template
 
     agent = create_react_agent(llm, tools, agent_prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True, max_iterations=3, early_stopping_method="generate")
 
     # Initialize chat history in session state
     if "messages" not in st.session_state:
