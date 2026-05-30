@@ -420,10 +420,11 @@ else:
         1. NO "walls of text". Use highly scannable formatting (bullet points, bold text).
         2. You MUST ground your insights with concrete evidence counts (e.g., "based on 12 job postings").
         3. For the Sales persona, calculate a realistic "Estimated Pipeline Value" metric. Assume an average Enterprise Deal Size (ACV) of $120,000 per High-Intent signal found.
+        4. ABSOLUTELY NO EMOJIS. Use formal, professional business language.
         
         Format your response EXACTLY like this structure for each persona:
         
-        ### 🎯 For [Persona Name]
+        ### For [Persona Name]
         *   **The Signal (What):** [1 sentence data-backed observation]
         *   **The Impact (So What):** [1 sentence explaining the business shift]
         *   **Action Item (Now What):** [1 specific, urgent action they must take today]
@@ -455,7 +456,7 @@ else:
 
     # Display the report if it exists in session state
     if 'intelligence_report' in st.session_state:
-        with st.expander("ℹ️ Methodology: How is the Pipeline Value Calculated?"):
+        with st.expander("Methodology: How is the Pipeline Value Calculated?"):
             st.write("The **Estimated Pipeline Value** is programmatically estimated by our reasoning engine. It multiplies the volume of high-intent hiring signals detected for a company by a baseline Enterprise Annual Contract Value (ACV) of **$120,000**.")
         st.info(st.session_state['intelligence_report'])
         
@@ -468,9 +469,10 @@ else:
                 with st.spinner("Drafting personalized outreach..."):
                     email_prompt = PromptTemplate.from_template(
                         """
+                        You are an Enterprise Account Executive at an MLOps platform.
                         Write a short, punchy cold email to the VP of Engineering at {company}.
                         Context: They are hiring for {skills} and prioritizing {priority}.
-                        Rules: Under 100 words, direct, no fluff.
+                        Rules: Under 100 words, direct, no fluff, professional tone.
                         """
                     )
                     top_row = df_filtered.iloc[0]
