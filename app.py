@@ -419,6 +419,7 @@ else:
         CRITICAL RULES:
         1. NO "walls of text". Use highly scannable formatting (bullet points, bold text).
         2. You MUST ground your insights with concrete evidence counts (e.g., "based on 12 job postings").
+        3. For the Sales persona, calculate a realistic "Estimated Pipeline Value" metric. Assume an average Enterprise Deal Size (ACV) of $120,000 per High-Intent signal found.
         
         Format your response EXACTLY like this structure for each persona:
         
@@ -426,6 +427,7 @@ else:
         *   **The Signal (What):** [1 sentence data-backed observation]
         *   **The Impact (So What):** [1 sentence explaining the business shift]
         *   **Action Item (Now What):** [1 specific, urgent action they must take today]
+        *   **Opportunity Metric:** [1 specific numeric metric, e.g., 'Estimated $X in new pipeline generated this week' or 'X% increase in AI infrastructure hiring']
         """
     )
     
