@@ -31,9 +31,21 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
 
-    /* Hide Streamlit Branding & Header */
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
+    /* Secret Header: Visible only on hover to maintain SaaS illusion */
+    header {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    header:hover {
+        opacity: 1;
+    }
+    #MainMenu {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    #MainMenu:hover {
+        opacity: 1;
+    }
     footer {visibility: hidden;}
     
     /* Global App Background */
@@ -154,6 +166,12 @@ if not df.empty:
 with st.sidebar:
     st.title("📈 PulseSignal")
     st.write("**GTM Strategy Engine**")
+    
+    # UI UPGRADE: Sync Button
+    if st.button("🔄 Sync & Refresh Data"):
+        st.cache_data.clear()
+        st.rerun()
+
     st.info("Targeting high-intent AI accounts across Giants & Disruptors.")
     
     st.markdown("---")
