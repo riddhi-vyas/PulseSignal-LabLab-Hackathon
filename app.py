@@ -558,7 +558,7 @@ Final Answer: [your exact answer here]
 """ + agent_prompt.template
 
     agent = create_react_agent(llm, tools, agent_prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True, max_iterations=3, early_stopping_method="generate")
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True, max_iterations=3, early_stopping_method="force")
 
     # Initialize chat history in session state
     if "messages" not in st.session_state:
