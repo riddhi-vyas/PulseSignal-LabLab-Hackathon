@@ -121,6 +121,7 @@ df = load_data()
 # --- ACCOUNT SEGMENTATION LISTS ---
 AI_GIANTS = ["NVIDIA", "Meta", "Google", "Microsoft", "Amazon"]
 AI_DISRUPTORS = ["OpenAI", "Anthropic", "Databricks", "Snowflake", "Mistral AI", "Cohere", "Perplexity"]
+EARLY_STAGE = ["Wafer", "Manufact", "Ineffable Intelligence"]
 
 # --- MASTER ACCOUNT REGISTRY (Data Integrity Layer) ---
 # Verified 2026 Market Data for Enterprise Accuracy
@@ -136,7 +137,10 @@ COMPANY_METADATA = {
     "Snowflake": {"stage": "Public/FAANG", "size": "Enterprise (501+)"},
     "Mistral AI": {"stage": "Growth (B/C)", "size": "Enterprise (501+)"},
     "Cohere": {"stage": "Growth (B/C)", "size": "Enterprise (501+)"},
-    "Perplexity": {"stage": "Growth (B/C)", "size": "Enterprise (501+)"}
+    "Perplexity": {"stage": "Growth (B/C)", "size": "Enterprise (501+)"},
+    "Wafer": {"stage": "Early (Seed/A)", "size": "Small (1-50)"},
+    "Manufact": {"stage": "Early (Seed/A)", "size": "Small (1-50)"},
+    "Ineffable Intelligence": {"stage": "Early (Seed/A)", "size": "Small (1-50)"}
 }
 
 # --- GLOBAL DATA INTEGRITY OVERRIDE ---
@@ -157,8 +161,8 @@ with st.sidebar:
     # New Segmentation Filters
     segment_filter = st.multiselect(
         "Market Segment", 
-        ["AI Giants", "AI Disruptors"], 
-        default=["AI Giants", "AI Disruptors"]
+        ["AI Giants", "AI Disruptors", "Early Stage"], 
+        default=["AI Giants", "AI Disruptors", "Early Stage"]
     )
     
     # Growth Stage Filter
@@ -182,6 +186,8 @@ def filter_dataframe(df):
         selected_companies.extend(AI_GIANTS)
     if "AI Disruptors" in segment_filter:
         selected_companies.extend(AI_DISRUPTORS)
+    if "Early Stage" in segment_filter:
+        selected_companies.extend(EARLY_STAGE)
     
     filtered_df = filtered_df[filtered_df['company'].isin(selected_companies)]
     

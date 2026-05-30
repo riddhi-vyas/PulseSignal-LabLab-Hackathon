@@ -13,7 +13,8 @@ ZONE = os.getenv("BRIGHTDATA_ZONE", "pulsesignal_serp")
 
 TARGET_COMPANIES = [
     "NVIDIA", "Meta", "Google", "Microsoft", "Amazon", # AI Giants
-    "OpenAI", "Anthropic", "Databricks", "Snowflake", "Mistral AI", "Cohere", "Perplexity" # AI Disruptors
+    "OpenAI", "Anthropic", "Databricks", "Snowflake", "Mistral AI", "Cohere", "Perplexity", # AI Disruptors
+    "Wafer", "Manufact", "Ineffable Intelligence" # Early Stage (Seed/A)
 ]
 
 def fetch_live_signals(company):
