@@ -1,3 +1,5 @@
+![PulseSignal Cover](cover_image.png)
+
 # PulseSignal: Executive GTM Strategy Engine
 
 **Built for the Web Data UNLOCKED Hackathon (May 2026)**
